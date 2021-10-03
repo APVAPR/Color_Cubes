@@ -1,26 +1,7 @@
 import tkinter as tk
 import random
 
-
-def print_hello():
-    return 'hello'
-
-
 count = 0
-
-
-def sklonenie():
-    global count
-    for i in range(2, 5):
-        if count % 10 == i:
-            return 'раза'
-    return 'раз'
-
-
-def counter():
-    global count
-    count += 1
-    button1['text'] = f'Нажали {count} {sklonenie()}'
 
 
 def bg_color_change():
@@ -49,63 +30,75 @@ def color_rand():
 
 class My_Button(tk.Button):
     def __init__(self, master, x, y, *args, **kwargs):
-        super(My_Button, self).__init__(master, width=3, bg=f'{color_rand()}', command=self.check_status)
+        super(My_Button, self).__init__(master, width=3, bg=f'{color_rand()}', command=self.button_push)
         self.master = master
         self.x = x
         self.y = y
         self.status = self['bg']
-
+        self.list_btn_for_change = []
 
     def __str__(self):
-        return f'{self.status}, {self.x}, {self.y}'
+        return f'{self.status}[{self.x}] [{self.y}]'
 
+    def __repr__(self):
+        return f'{self.status}[{self.x}] [{self.y}]'
 
-    def check_around(self, lst=[]):
+    def check_around(self, x, y, lst=[]):
         """
-        Check color around self button
+        Определяет такой ли цвет у кнопок по сторонам, как у нажатой кнопки.
+        Добавляет кортеж с координатами таких кнопок в список.
+        Рекурсивно проверяет у рядом стоящих одноцветных кнопок цвет соседних
+        Возвращает список с координатами одноцветных с нажатой кнопок
 
         """
-        same_color_btn_tmp = lst
 
-        if len(same_color_btn_tmp) == 1:
-            return same_color_btn_tmp
+        temp_lst = lst
+        mwb = Main_window.buttons
+        print(f'Start list {temp_lst}')
+        count = 0
+        if not (x, y) in temp_lst:
+            temp_lst.append((x, y))
+            count += 1
 
-        for i in range(-1, 2):
-            btn_around = Main_window.buttons[self.x][self.y + i]
-            if btn_around['bg'] == self['bg']:
-                same_color_btn_tmp.append(btn_around)
-                self.check_around(btn_around)
-        btn_around = Main_window.buttons[self.x - 1][self.y]
-        if btn_around['bg'] == self['bg']:
-            same_color_btn_tmp.append(btn_around)
-            self.check_around(btn_around)
-        btn_around = Main_window.buttons[self.x + 1][self.y]
-        if btn_around['bg'] == self['bg']:
-            same_color_btn_tmp.append(btn_around)
-            self.check_around(btn_around)
-        return same_color_btn_tmp
+        if mwb[x][y]['bg'] == mwb[x][y - 1]['bg'] and (x, y - 1) not in temp_lst:
+            temp_lst.append((x, y - 1))
+            count += 1
+            print('Добавил левую')
+        if mwb[x][y]['bg'] == mwb[x][y + 1]['bg'] and (x, y + 1) not in temp_lst:
+            temp_lst.append((x, y + 1))
+            count += 1
+            print('Добавил правую')
+        if mwb[x][y]['bg'] == mwb[x - 1][y]['bg'] and (x - 1, y) not in temp_lst:
+            temp_lst.append((x - 1, y))
+            count += 1
+            print('Добавил верхнюю')
+        if mwb[x][y]['bg'] == mwb[x + 1][y]['bg'] and (x + 1, y) not in temp_lst:
+            temp_lst.append((x + 1, y))
+            count += 1
+            print('Добавил нижнюю')
+        if count == 0:
+            print('Остался один экземпляр')
+            return temp_lst
 
+        for row, col in temp_lst:
+            print(f'row = {row}, x = {x}')
+            print(f'col = {col}, y = {y}')
+            if mwb[row][col]['bg'] == mwb[x][y]['bg']:
+                if not (row == x and col == y):
+                    print('Для всех кроме центральной применяю рекрсивную функцию ')
+                    self.check_around(row, col, temp_lst)
 
-        # same_color_btn_tmp = []
-        # count = 0
-        # for i in range(-1, 2):
-        #     btn_around = Main_window.buttons[self.x][self.y + i]
-        #     if btn_around['bg'] == self['bg']:
-        #         same_color_btn_tmp.append(btn_around)
-        #         count += 1
-        # btn_around = Main_window.buttons[self.x - 1][self.y]
-        # if btn_around['bg'] == self['bg']:
-        #     same_color_btn_tmp.append(btn_around)
-        #     count += 1
-        # btn_around = Main_window.buttons[self.x + 1][self.y]
-        # if btn_around['bg'] == self['bg']:
-        #     same_color_btn_tmp.append(btn_around)
-        #     count += 1
-        # print(count, same_color_btn_tmp)
+                    print('Рекурсивная функция отработрала')
+        print(f'Возвращаю список {temp_lst}')
+        return temp_lst
 
+    def change_color(self, same_color_list):
+        for r, c in same_color_list:
+            Main_window.buttons[r][c].config(bg='black', state='disabled')
 
-    def check_status(self):
-        print(self.check_around())
+    def button_push(self):
+        same_color_btn = self.check_around(self.x, self.y, [])
+        self.change_color(same_color_btn)
 
 
 class Main_window:
@@ -116,8 +109,8 @@ class Main_window:
     def __init__(self):
         self.win = tk.Tk()
         self.win.title('Color Cubs')
-        photo = tk.PhotoImage(file='Logo.png')
-        self.win.iconphoto(False, photo)
+        # photo = tk.PhotoImage(file='Logo.png')
+        # self.win.iconphoto(False, photo)
         # self.win.geometry('800x600+500+200')
         self.win.config(bg='#8eb6ce')
 
