@@ -4,25 +4,6 @@ import random
 count = 0
 
 
-def bg_color_change():
-    global win
-    s = [i for i in str(random.randint(100000, 1000000))]
-    w = ['a', 'b', 'c', 'd', 'f']
-    for i in range(1, 6, 2):
-        s[i] = random.choice(w)
-    bgcolor = '#' + ''.join(s)
-    win.config(bg=bgcolor)
-
-
-def rgb_color_rand():
-    s = [i for i in str(random.randint(100000, 1000000))]
-    w = ['a', 'b', 'c', 'd', 'f']
-    for i in range(1, 6, 2):
-        s[i] = random.choice(w)
-    bgcolor = '#' + ''.join(s)
-    return bgcolor
-
-
 def color_rand():
     colors = ['#eb3734', '#3499eb', '#4fbd70', '#bd79ad', '#d9d780', '#36856e']
     return random.choice(colors)
@@ -52,30 +33,30 @@ class My_Button(tk.Button):
 
         """
 
-        temp_lst = lst
+        # temp_lst = lst
         mwb = Main_window.buttons
         # print(f'Start list {temp_lst}')
         count = 0
-        if not (x, y) in temp_lst:
-            temp_lst.append((x, y))
+        if not (x, y) in lst:
+            lst.append((x, y))
             count += 1
         center_btn = mwb[x][y]['bg']
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 btn = mwb[x + i][y + j]['bg']
-                if btn == center_btn and (x + i, y + j) not in temp_lst:
-                    temp_lst.append((x + i, y + j))
+                if btn == center_btn and (x + i, y + j) not in lst:
+                    lst.append((x + i, y + j))
                     count += 1
 
         if count == 0:
-            return temp_lst
+            return lst
 
-        for row, col in temp_lst:
+        for row, col in lst:
             if mwb[row][col]['bg'] == mwb[x][y]['bg']:
                 if not (row == x and col == y):
-                    self.check_around(row, col, temp_lst)
+                    self.check_around(row, col, lst)
 
-        return temp_lst
+        return lst
 
     def itarate_same_btn_lst(self, same_color_list, func):
         same_color_list = sorted(same_color_list, key=lambda x: (x[0], x[1]))
@@ -117,7 +98,6 @@ class My_Button(tk.Button):
             if black_column:
                 Main_window.shift_column(black_column)
                 black_column = []
-
 
 
 class Main_window:
@@ -179,12 +159,11 @@ class Main_window:
                     else:
                         btn1['bg'], btn2['bg'] = btn2['bg'], btn1['bg']
 
-
     def start_new_round(self):
         self.creat_menu()
         self.win.mainloop()
 
 
-a = Main_window()
-
-a.start_new_round()
+if __name__ == '__main__':
+    a = Main_window()
+    a.start_new_round()
