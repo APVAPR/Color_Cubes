@@ -18,20 +18,17 @@ class My_Button(tk.Button):
         self.master = master
         self.x = x
         self.y = y
-        self.status = self['bg']
-        self.list_btn_for_change = []
+        self.color = colors_name[self['bg']]
 
     def __str__(self):
         if self["bg"] == 'black':
             return f'{self["bg"]}[{self.x}] [{self.y}]'
-        return f'{colors_name[self.status]}[{self.x}] [{self.y}]'
+        return f'{self.color}[{self.x}] [{self.y}]'
 
     def __repr__(self):
         if self["bg"] == 'black':
             return f'{self["bg"]}[{self.x}] [{self.y}]'
-        return f'{colors_name[self.status]}[{self.x}] [{self.y}]'
-
-
+        return f'{self.color}[{self.x}] [{self.y}]'
 
 
 class Main_window:
@@ -56,17 +53,18 @@ class Main_window:
                 if col == 0 or col == self.COLUMN + 1 or row == 0 or row == self.ROW + 1:
                     btn.config(bg='black', state='disabled')
             self.buttons.append(temp)
+        self.start_new_round()
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
         if len(same_color_btn) > 1:
-            self.counter_scores(same_color_btn)
             self.itarate_same_btn_lst(same_color_btn, self.change_clr_to_up_btn)
-            self.show_in_console()
-
             black_column = self.check_low_row()
             if black_column:
                 self.shift_column(black_column)
+            self.counter_scores(same_color_btn)
+        self.show_in_console()
+        print(clicked_button.color)
 
     def check_around(self, x, y, some_btn_lst=None):
         """
@@ -106,24 +104,22 @@ class Main_window:
 
     def colorate_btn(self, row, col, color='black'):
         if row and col:
-            Main_window.buttons[row][col].config(bg=color, state='disabled')
+            self.buttons[row][col].config(bg=color, state='disabled')
 
     def change_clr_to_up_btn(self, row, col):
         """
         функция изменяет цвет по всей колонке.
 
         """
-        mwb = Main_window.buttons
-
         for i in range(row, -1, -1):
-            btn = mwb[i][col]
-            btn2 = mwb[i - 1][col]
+            btn = self.buttons[i][col]
+            btn2 = self.buttons[i - 1][col]
             if btn2['bg'] == 'black':
                 btn['bg'] = 'black'
             else:
                 btn2['bg'], btn['bg'] = btn['bg'], btn2['bg']
 
-    def creat_menu(self):
+    def create_menu(self):
         menubar = tk.Menu(self.win)
         self.win.config(menu=menubar)
 
@@ -167,20 +163,17 @@ class Main_window:
         print(table.draw())
 
     def reload_game(self):
-        print(self.win.winfo_children())
         [child.destroy() for child in self.win.winfo_children()]
         self.scores = 0
         self.__init__()
-        # self.start_new_round()
 
     def finish_game(self):
         pass
 
     def start_new_round(self):
-        self.creat_menu()
+        self.create_menu()
         self.win.mainloop()
 
 
 if __name__ == '__main__':
     a = Main_window()
-    a.start_new_round()
