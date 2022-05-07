@@ -1,7 +1,10 @@
 import tkinter as tk
 import random
+from texttable import Texttable
 
 count = 0
+colors_name = {'#eb3734': 'red', '#3499eb': 'blue', '#4fbd70': 'green', '#bd79ad': 'pink', '#d9d780': 'yellow',
+               '#36856e': 'darkgreen', }
 
 
 def color_rand():
@@ -11,7 +14,7 @@ def color_rand():
 
 class My_Button(tk.Button):
     def __init__(self, master, x, y, *args, **kwargs):
-        super(My_Button, self).__init__(master, width=3, bg=f'{color_rand()}', command=self.button_push)
+        super().__init__(master, width=3, bg=f'{color_rand()}', command=self.button_push)
         self.master = master
         self.x = x
         self.y = y
@@ -19,60 +22,71 @@ class My_Button(tk.Button):
         self.list_btn_for_change = []
 
     def __str__(self):
-        return f'{self.status}[{self.x}] [{self.y}]'
+        if self["bg"] == 'black':
+            return f'{self["bg"]}[{self.x}] [{self.y}]'
+        return f'{colors_name[self.status]}[{self.x}] [{self.y}]'
 
     def __repr__(self):
-        return f'{self.status}[{self.x}] [{self.y}]'
+        if self["bg"] == 'black':
+            return f'{self["bg"]}[{self.x}] [{self.y}]'
+        return f'{colors_name[self.status]}[{self.x}] [{self.y}]'
 
-    def check_around(self, x, y, lst=[]):
+    def button_push(self):
+        same_color_btn = self.check_around(self.x, self.y, [])
+        if len(same_color_btn) > 1:
+            Main_window.counter_scores(same_color_btn)
+            self.itarate_same_btn_lst(same_color_btn, self.change_clr_to_up_btn)
+            black_column = Main_window.check_low_row()
+            if black_column:
+                Main_window.shift_column(black_column)
+
+    def check_around(self, x, y, some_btn_lst=None):
         """
-        Определяет такой ли цвет у кнопок по сторонам, как у нажатой кнопки.
+        Определяет такой ли цвет у соседних кнопок, как у нажатой кнопки.
         Добавляет кортеж с координатами таких кнопок в список.
         Рекурсивно проверяет у рядом стоящих одноцветных кнопок цвет соседних
         Возвращает список с координатами одноцветных с нажатой кнопок
 
         """
-
-        # temp_lst = lst
+        if some_btn_lst is None:
+            some_btn_lst = []
         mwb = Main_window.buttons
-        # print(f'Start list {temp_lst}')
         count = 0
-        if not (x, y) in lst:
-            lst.append((x, y))
+        if not (x, y) in some_btn_lst:
+            some_btn_lst.append((x, y))
             count += 1
         center_btn = mwb[x][y]['bg']
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 btn = mwb[x + i][y + j]['bg']
-                if btn == center_btn and (x + i, y + j) not in lst:
-                    lst.append((x + i, y + j))
+                if btn == center_btn and (x + i, y + j) not in some_btn_lst:
+                    some_btn_lst.append((x + i, y + j))
                     count += 1
-
         if count == 0:
-            return lst
+            return some_btn_lst
 
-        for row, col in lst:
+        for row, col in some_btn_lst:
             if mwb[row][col]['bg'] == mwb[x][y]['bg']:
                 if not (row == x and col == y):
-                    self.check_around(row, col, lst)
+                    self.check_around(row, col, some_btn_lst)
+        return some_btn_lst
 
-        return lst
-
-    def itarate_same_btn_lst(self, same_color_list, func):
+    @staticmethod
+    def itarate_same_btn_lst(same_color_list, func):
         same_color_list = sorted(same_color_list, key=lambda x: (x[0], x[1]))
         for r, c in same_color_list:
             func(r, c)
 
-    def colorate_btn(self, row, col, color='black'):
+    @staticmethod
+    def colorate_btn(row, col, color='black'):
         if row and col:
             Main_window.buttons[row][col].config(bg=color, state='disabled')
 
-    def change_clr_to_up_btn(self, row, col):
+    @staticmethod
+    def change_clr_to_up_btn(row, col):
         """
         функция изменяет цвет по всей колонке.
-        :param row:
-        :param col:
-        :return:
+
         """
         mwb = Main_window.buttons
 
@@ -84,35 +98,20 @@ class My_Button(tk.Button):
             else:
                 btn2['bg'], btn['bg'] = btn['bg'], btn2['bg']
 
-    def counter_scores(self, same_btns):
-        Main_window.scores += len(same_btns) ** 2
 
-    def button_push(self):
-        same_color_btn = self.check_around(self.x, self.y, [])
-        if len(same_color_btn) > 1:
-            self.counter_scores(same_color_btn)
-            print(Main_window.scores)
-            self.itarate_same_btn_lst(same_color_btn, self.change_clr_to_up_btn)
-            black_column = []
-            black_column = Main_window.check_low_row()
-            if black_column:
-                Main_window.shift_column(black_column)
-                black_column = []
 
 
 class Main_window:
-    ROW = 20
-    COLUMN = 10
+    win = tk.Tk()
+    win.title('Color Cubs')
+    win.config(bg='#8eb6ce')
+
+    ROW = 10
+    COLUMN = 5
     buttons = []
     scores = 0
 
     def __init__(self):
-        self.win = tk.Tk()
-        self.win.title('Color Cubs')
-        # photo = tk.PhotoImage(file='Logo.png')
-        # self.win.iconphoto(False, photo)
-        # self.win.geometry('800x600+500+200')
-        self.win.config(bg='#8eb6ce')
 
         for row in range(Main_window.ROW + 2):
             temp = []
@@ -124,15 +123,12 @@ class Main_window:
                     btn.config(bg='black', state='disabled')
             Main_window.buttons.append(temp)
 
-    def finish_game(self):
-        pass
-
     def creat_menu(self):
         menubar = tk.Menu(self.win)
         self.win.config(menu=menubar)
 
         file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label='Game', command=self.start_new_round)
+        file_menu.add_command(label='Game', command=self.reload_game)
         file_menu.add_command(label='Settings')
         file_menu.add_command(label='Quit', command=self.win.destroy)
         menubar.add_cascade(label='File', menu=file_menu)
@@ -144,7 +140,6 @@ class Main_window:
             btn = Main_window.buttons[Main_window.ROW][col]
             if btn['bg'] == 'black':
                 empty_column_list.append(col)
-        print(empty_column_list)
         return empty_column_list
 
     @staticmethod
@@ -158,6 +153,32 @@ class Main_window:
                         continue
                     else:
                         btn1['bg'], btn2['bg'] = btn2['bg'], btn1['bg']
+
+    @staticmethod
+    def counter_scores(same_btns):
+        Main_window.scores += len(same_btns) ** 2
+
+    @staticmethod
+    def show_in_console():
+        table = Texttable()
+        for i in Main_window.buttons:
+            table.add_row(i)
+
+        score_row = ['' for j in range(len(i))]
+        score_row[-1] = Main_window.scores
+        score_row[-2] = 'Score is:'
+        table.add_row(score_row)
+        print(table.draw())
+
+    def reload_game(self):
+        print(self.win.winfo_children())
+        [child.destroy() for child in self.win.winfo_children()]
+        Main_window.scores = 0
+        self.__init__()
+        # self.start_new_round()
+
+    def finish_game(self):
+        pass
 
     def start_new_round(self):
         self.creat_menu()
