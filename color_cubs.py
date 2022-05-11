@@ -4,7 +4,7 @@ from texttable import Texttable
 
 count = 0
 colors_name = {'#eb3734': 'red', '#3499eb': 'blue', '#4fbd70': 'green', '#bd79ad': 'pink', '#d9d780': 'yellow',
-               '#36856e': 'darkgreen', }
+               '#36856e': 'darkgreen'}
 
 
 def color_rand():
@@ -18,23 +18,24 @@ class My_Button(tk.Button):
         self.master = master
         self.x = x
         self.y = y
-        self.color = colors_name[self['bg']]
+        self.color = self.__str__()
 
     def __str__(self):
         if self["bg"] == 'black':
-            return f'{self["bg"]}[{self.x}] [{self.y}]'
-        return f'{self.color}[{self.x}] [{self.y}]'
+            return f'{self["bg"]}'
 
-    def __repr__(self):
-        if self["bg"] == 'black':
-            return f'{self["bg"]}[{self.x}] [{self.y}]'
-        return f'{self.color}[{self.x}] [{self.y}]'
+        return f'{colors_name[self["bg"]]}'
+
+    # def __repr__(self):
+    # if self["bg"] == 'black':
+    #     return f'{self["bg"]}[{self.x}] [{self.y}]'
+    # return f'{self.color}[{self.x}] [{self.y}]'
 
 
 class Main_window:
     win = tk.Tk()
     win.title('Color Cubs')
-    win.config(bg='#8eb6ce')
+    win.config(bg='black')
 
     ROW = 10
     COLUMN = 5
@@ -51,20 +52,24 @@ class Main_window:
                 temp.append(btn)
                 btn.grid(row=row, column=col)
                 if col == 0 or col == self.COLUMN + 1 or row == 0 or row == self.ROW + 1:
-                    btn.config(bg='black', state='disabled')
+                    btn.config(bg='black', state=tk.DISABLED)
             self.buttons.append(temp)
+        self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
+        self.scores_label.grid(row=self.ROW+3, column=self.COLUMN, columnspan=3)
         self.start_new_round()
+
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
         if len(same_color_btn) > 1:
-            self.itarate_same_btn_lst(same_color_btn, self.change_clr_to_up_btn)
+            self.itarate_same_btn_lst(same_color_btn, self.change_color_column)
             black_column = self.check_low_row()
             if black_column:
                 self.shift_column(black_column)
             self.counter_scores(same_color_btn)
         self.show_in_console()
-        print(clicked_button.color)
+        self.scores_label.config(text=f'Scores: {self.scores}')
+        print(f'Clicked button is: {clicked_button.color}')
 
     def check_around(self, x, y, some_btn_lst=None):
         """
@@ -102,11 +107,14 @@ class Main_window:
         for r, c in same_color_list:
             func(r, c)
 
-    def colorate_btn(self, row, col, color='black'):
-        if row and col:
-            self.buttons[row][col].config(bg=color, state='disabled')
+    # @staticmethod
+    # def black_button_disabled(button):
+    #     if button.color == 'black':
+    #         button.config(state=tk.DISABLED)
+    #     else:
+    #         button.config(state=tk.NORMAL)
 
-    def change_clr_to_up_btn(self, row, col):
+    def change_color_column(self, row, col):
         """
         функция изменяет цвет по всей колонке.
 
@@ -119,15 +127,8 @@ class Main_window:
             else:
                 btn2['bg'], btn['bg'] = btn['bg'], btn2['bg']
 
-    def create_menu(self):
-        menubar = tk.Menu(self.win)
-        self.win.config(menu=menubar)
-
-        file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label='Game', command=self.reload_game)
-        file_menu.add_command(label='Settings')
-        file_menu.add_command(label='Quit', command=self.win.destroy)
-        menubar.add_cascade(label='File', menu=file_menu)
+                # self.black_button_disabled(btn)
+                # self.black_button_disabled(btn2)
 
     def check_low_row(self):
         empty_column_list = []
@@ -151,12 +152,22 @@ class Main_window:
     def counter_scores(self, same_btns):
         self.scores += len(same_btns) ** 2
 
+    def create_menu(self):
+        menubar = tk.Menu(self.win)
+        self.win.config(menu=menubar)
+
+        file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(label='Game', command=self.reload_game)
+        file_menu.add_command(label='Settings')
+        file_menu.add_command(label='Quit', command=self.win.destroy)
+        menubar.add_cascade(label='File', menu=file_menu)
+
     def show_in_console(self):
         table = Texttable()
         for i in self.buttons:
             table.add_row(i)
 
-        score_row = ['' for j in range(len(i))]
+        score_row = ['' for _ in range(len(i))]
         score_row[-1] = self.scores
         score_row[-2] = 'Score is:'
         table.add_row(score_row)
