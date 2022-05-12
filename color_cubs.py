@@ -55,9 +55,8 @@ class Main_window:
                     btn.config(bg='black', state=tk.DISABLED)
             self.buttons.append(temp)
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
-        self.scores_label.grid(row=self.ROW+3, column=self.COLUMN, columnspan=3)
+        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN, columnspan=3)
         self.start_new_round()
-
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
@@ -66,6 +65,7 @@ class Main_window:
             black_column = self.check_low_row()
             if black_column:
                 self.shift_column(black_column)
+            self.change_button_state()
             self.counter_scores(same_color_btn)
         self.show_in_console()
         self.scores_label.config(text=f'Scores: {self.scores}')
@@ -107,12 +107,13 @@ class Main_window:
         for r, c in same_color_list:
             func(r, c)
 
-    # @staticmethod
-    # def black_button_disabled(button):
-    #     if button.color == 'black':
-    #         button.config(state=tk.DISABLED)
-    #     else:
-    #         button.config(state=tk.NORMAL)
+    def change_button_state(self):
+        for row in self.buttons:
+            for button in row:
+                if button['bg'] == 'black' and button['state'] != 'disabled':
+                    button['state'] = tk.DISABLED
+                elif button['bg'] != 'black' and button['state'] == 'disabled':
+                    button['state'] = tk.NORMAL
 
     def change_color_column(self, row, col):
         """
