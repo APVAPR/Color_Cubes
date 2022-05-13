@@ -26,11 +26,6 @@ class My_Button(tk.Button):
 
         return f'{colors_name[self["bg"]]}'
 
-    # def __repr__(self):
-    # if self["bg"] == 'black':
-    #     return f'{self["bg"]}[{self.x}] [{self.y}]'
-    # return f'{self.color}[{self.x}] [{self.y}]'
-
 
 class Main_window:
     win = tk.Tk()
@@ -41,6 +36,7 @@ class Main_window:
     COLUMN = 5
     buttons = []
     scores = 0
+    moves = 0
 
     def __init__(self):
 
@@ -55,20 +51,21 @@ class Main_window:
                     btn.config(bg='black', state=tk.DISABLED)
             self.buttons.append(temp)
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
-        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN, columnspan=3)
+        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN - 2, columnspan=100)
         self.start_new_round()
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
         if len(same_color_btn) > 1:
-            self.itarate_same_btn_lst(same_color_btn, self.change_color_column)
+            self.iterate_same_btn_lst(same_color_btn, self.change_color_column)
             black_column = self.check_low_row()
             if black_column:
                 self.shift_column(black_column)
             self.change_button_state()
             self.counter_scores(same_color_btn)
+            self.moves += 1
         self.show_in_console()
-        self.scores_label.config(text=f'Scores: {self.scores}')
+        self.scores_label.config(text=f'Moves: {self.moves} Scores: {self.scores}')
         print(f'Clicked button is: {clicked_button.color}')
 
     def check_around(self, x, y, some_btn_lst=None):
@@ -101,12 +98,6 @@ class Main_window:
                     self.check_around(row, col, some_btn_lst)
         return some_btn_lst
 
-    @staticmethod
-    def itarate_same_btn_lst(same_color_list, func):
-        same_color_list = sorted(same_color_list, key=lambda x: (x[0], x[1]))
-        for r, c in same_color_list:
-            func(r, c)
-
     def change_button_state(self):
         for row in self.buttons:
             for button in row:
@@ -128,8 +119,11 @@ class Main_window:
             else:
                 btn2['bg'], btn['bg'] = btn['bg'], btn2['bg']
 
-                # self.black_button_disabled(btn)
-                # self.black_button_disabled(btn2)
+    @staticmethod
+    def iterate_same_btn_lst(same_color_list, func):
+        same_color_list = sorted(same_color_list, key=lambda x: (x[0], x[1]))
+        for r, c in same_color_list:
+            func(r, c)
 
     def check_low_row(self):
         empty_column_list = []
@@ -179,8 +173,17 @@ class Main_window:
         self.scores = 0
         self.__init__()
 
+    def is_all_buttons_black(self):
+        for row in self.buttons:
+            for button in row:
+                if button['bg'] != 'black':
+                    return False
+        return True
+
     def finish_game(self):
-        pass
+        if self.is_all_buttons_black():
+            self.scores *= 2
+            print("You win!!!")
 
     def start_new_round(self):
         self.create_menu()
