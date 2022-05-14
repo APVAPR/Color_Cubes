@@ -13,6 +13,7 @@ def color_rand():
 
 
 class My_Button(tk.Button):
+
     def __init__(self, master, x, y, *args, **kwargs):
         super().__init__(master, width=3, bg=f'{color_rand()}')
         self.master = master
@@ -40,6 +41,12 @@ class Main_window:
 
     def __init__(self):
 
+        self.scores_label = None
+        self.make_game_buttons_list()
+        self.show_scores_label()
+        self.start_new_round()
+
+    def make_game_buttons_list(self):
         for row in range(self.ROW + 2):
             temp = []
             for col in range(self.COLUMN + 2):
@@ -50,9 +57,10 @@ class Main_window:
                 if col == 0 or col == self.COLUMN + 1 or row == 0 or row == self.ROW + 1:
                     btn.config(bg='black', state=tk.DISABLED)
             self.buttons.append(temp)
+
+    def show_scores_label(self):
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
         self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN - 2, columnspan=100)
-        self.start_new_round()
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
@@ -66,6 +74,7 @@ class Main_window:
             self.moves += 1
         self.show_in_console()
         self.scores_label.config(text=f'Moves: {self.moves} Scores: {self.scores}')
+        # self.finish_game()
         print(f'Clicked button is: {clicked_button.color}')
 
     def check_around(self, x, y, some_btn_lst=None):
@@ -180,10 +189,36 @@ class Main_window:
                     return False
         return True
 
+    def is_has_moves(self):
+        for row in self.buttons[1: self.ROW - 2]:
+            for button in row[1: self.COLUMN - 2]:
+                if self.check_around(button.x, button.y):
+                    print(self.check_around(button.x, button.y))
+                    return True
+        return False
+
+    @staticmethod
+    def win_window(text):
+        win = tk.Tk()
+        win.title('You win!')
+        label = tk.Label(win, text=text)
+        label.pack()
+
     def finish_game(self):
+        is_finish = False
         if self.is_all_buttons_black():
             self.scores *= 2
             print("You win!!!")
+            text = f'You win!!! Your score is: {self.scores}'
+            is_finish = True
+
+        elif not self.is_has_moves():
+            print(f'Your score is : {self.scores}')
+            text = f'Your score is: {self.scores}'
+            is_finish = True
+
+        if is_finish:
+            Main_window.win_window(text)
 
     def start_new_round(self):
         self.create_menu()
