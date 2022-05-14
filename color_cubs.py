@@ -15,7 +15,7 @@ def color_rand():
 class My_Button(tk.Button):
 
     def __init__(self, master, x, y, *args, **kwargs):
-        super().__init__(master, width=3, bg=f'{color_rand()}')
+        super().__init__(master, width=1, bg=f'{color_rand()}')
         self.master = master
         self.x = x
         self.y = y
@@ -60,7 +60,7 @@ class Main_window:
 
     def show_scores_label(self):
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
-        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN - 2, columnspan=100)
+        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN // 2, columnspan=100)
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
