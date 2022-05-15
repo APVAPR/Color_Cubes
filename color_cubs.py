@@ -74,12 +74,11 @@ class Main_window:
             self.moves += 1
         self.show_in_console()
         self.scores_label.config(text=f'Moves: {self.moves} Scores: {self.scores}')
-        # self.finish_game()
-        print(f'Clicked button is: {clicked_button.color}')
+        self.is_finish_game()
 
     def check_around(self, x, y, some_btn_lst=None):
         """
-        Определяет такой ли цвет у соседних кнопок, как у нажатой кнопки.
+        Определяет такой ли цвет у соседних кнопок, как у кнопки[x][y].
         Добавляет кортеж с координатами таких кнопок в список.
         Рекурсивно проверяет у рядом стоящих одноцветных кнопок цвет соседних
         Возвращает список с координатами одноцветных с нажатой кнопок
@@ -189,12 +188,21 @@ class Main_window:
                     return False
         return True
 
-    def is_has_moves(self):
-        for row in self.buttons[1: self.ROW - 2]:
-            for button in row[1: self.COLUMN - 2]:
-                if self.check_around(button.x, button.y):
-                    print(self.check_around(button.x, button.y))
+    def is_same_button_around(self, row, col):
+        center_btn = self.buttons[row][col]
+        for i in [-1, 0, 1]:
+            for j in [-1, 0, 1]:
+                btn = self.buttons[row + i][col + j]
+                if btn['bg'] == center_btn['bg'] and (btn is not center_btn):
                     return True
+        return False
+
+    def is_has_moves(self):
+        for row in self.buttons[1: self.ROW]:
+            for button in row[1: self.COLUMN]:
+                if button['state'] != 'disabled':
+                    if self.is_same_button_around(button.x, button.y):
+                        return True
         return False
 
     @staticmethod
@@ -204,7 +212,7 @@ class Main_window:
         label = tk.Label(win, text=text)
         label.pack()
 
-    def finish_game(self):
+    def is_finish_game(self):
         is_finish = False
         if self.is_all_buttons_black():
             self.scores *= 2
@@ -213,12 +221,12 @@ class Main_window:
             is_finish = True
 
         elif not self.is_has_moves():
-            print(f'Your score is : {self.scores}')
-            text = f'Your score is: {self.scores}'
+            print(f'Theren\'t moves. Your score is : {self.scores}')
+            text = f'Theren\'t moves. Your score is: {self.scores}'
             is_finish = True
 
         if is_finish:
-            Main_window.win_window(text)
+            self.win_window(text)
 
     def start_new_round(self):
         self.create_menu()
