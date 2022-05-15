@@ -1,22 +1,17 @@
-import _tkinter
 import tkinter as tk
 import random
 from texttable import Texttable
+import tkinter.font as font
 
 count = 0
 colors_name = {'#eb3734': 'red', '#3499eb': 'blue', '#4fbd70': 'green', '#bd79ad': 'pink', '#d9d780': 'yellow',
                '#36856e': 'darkgreen'}
 
 
-def color_rand():
-    colors = ['#eb3734', '#3499eb', '#4fbd70', '#bd79ad', '#d9d780', '#36856e']
-    return random.choice(colors)
-
-
 class My_Button(tk.Button):
 
     def __init__(self, master, x, y, *args, **kwargs):
-        super().__init__(master, width=1, bg=f'{color_rand()}')
+        super().__init__(master, width=1, bg=f'{self.color_rand()}')
         self.master = master
         self.x = x
         self.y = y
@@ -28,10 +23,16 @@ class My_Button(tk.Button):
 
         return f'{colors_name[self["bg"]]}'
 
+    @staticmethod
+    def color_rand():
+        colors = ['#eb3734', '#3499eb', '#4fbd70', '#bd79ad', '#d9d780', '#36856e']
+        return random.choice(colors)
+
 
 class Main_window:
     win = tk.Tk()
     win.title('Color Cubs')
+    # win.eval('tk::PlaceWindow %s center' % win.winfo_pathname(win.winfo_id()))
     win.config(bg='black')
 
     ROW = 10
@@ -179,13 +180,9 @@ class Main_window:
 
     def reload_game(self):
         self.show_in_console()
-        print('1')
         self.buttons.clear()
         self.scores = 0
         self.__init__()
-        print('3')
-        self.show_in_console()
-        print('4')
 
     def is_all_buttons_black(self):
         for row in self.buttons:
@@ -215,7 +212,9 @@ class Main_window:
     def win_window(text):
         win = tk.Tk()
         win.title('You win!')
+        win.eval('tk::PlaceWindow %s center' % win.winfo_pathname(win.winfo_id()))
         label = tk.Label(win, text=text)
+        label['font'] = font.Font(size=50)
         label.pack()
 
     def is_finish_game(self):
@@ -233,6 +232,10 @@ class Main_window:
 
         if is_finish:
             self.win_window(text)
+            for row in self.buttons:
+                for button in row:
+                    if button['state'] == tk.NORMAL:
+                        button['state'] = tk.DISABLED
 
     def start_new_round(self):
         self.create_menu()
