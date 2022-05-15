@@ -1,3 +1,4 @@
+import _tkinter
 import tkinter as tk
 import random
 from texttable import Texttable
@@ -177,9 +178,14 @@ class Main_window:
         print(table.draw())
 
     def reload_game(self):
-        [child.destroy() for child in self.win.winfo_children()]
+        self.show_in_console()
+        print('1')
+        self.buttons.clear()
         self.scores = 0
         self.__init__()
+        print('3')
+        self.show_in_console()
+        print('4')
 
     def is_all_buttons_black(self):
         for row in self.buttons:
