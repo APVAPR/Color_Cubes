@@ -34,8 +34,8 @@ class Main_window:
     win.title('Color Cubs')
     win.config(bg='black')
 
-    ROW = 10
-    COLUMN = 5
+    ROW = 15
+    COLUMN = 15
     buttons = []
     scores = 0
     moves = 0
@@ -159,9 +159,29 @@ class Main_window:
 
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label='Game', command=self.reload_game)
-        file_menu.add_command(label='Settings')
+        file_menu.add_command(label='Settings', command=self.create_settings_menu)
         file_menu.add_command(label='Quit', command=self.win.destroy)
         menubar.add_cascade(label='File', menu=file_menu)
+
+    def create_settings_menu(self):
+        setting_menu = tk.Toplevel(self.win)
+        setting_menu.wm_title('Settings')
+        tk.Label(setting_menu, text='Rows count:').grid(row=0, column=0)
+        tk.Label(setting_menu, text='Column count:').grid(row=1, column=0)
+        row_entry = tk.Entry(setting_menu)
+        row_entry.insert(0, self.ROW)
+        row_entry.grid(row=0, column=1)
+        column_entry = tk.Entry(setting_menu)
+        column_entry.insert(0, self.COLUMN)
+        column_entry.grid(row=1, column=1)
+        btn = tk.Button(setting_menu, text='Confirm', command=lambda: self.change_settings(row_entry, column_entry))
+        btn.grid(row=2, column=0, columnspan=2)
+
+    def change_settings(self, row: tk.Entry, column: tk.Entry):
+        self.ROW = int(row.get())
+        self.COLUMN = int(column.get())
+        self.win.children['!toplevel'].destroy()
+        self.reload_game()
 
     def show_in_console(self):
         table = Texttable()
