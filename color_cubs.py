@@ -193,16 +193,20 @@ class Main_window:
 
     def is_same_button_around(self, row, col):
         center_btn = self.buttons[row][col]
+        print(f'Center button is: {center_btn["bg"]}')
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 btn = self.buttons[row + i][col + j]
+                print(f'Checked button is: {btn["bg"]}')
                 if btn['bg'] == center_btn['bg'] and (btn is not center_btn):
+                    print('Has move!')
                     return True
+        print('Hasn\'t move')
         return False
 
     def is_has_moves(self):
-        for row in self.buttons[1: self.ROW]:
-            for button in row[1: self.COLUMN]:
+        for row in self.buttons[1: self.ROW + 1]:
+            for button in row[1: self.COLUMN + 1]:
                 if button['state'] != 'disabled':
                     if self.is_same_button_around(button.x, button.y):
                         return True
@@ -234,7 +238,7 @@ class Main_window:
             self.win_window(text)
             for row in self.buttons:
                 for button in row:
-                    if button['state'] == tk.NORMAL:
+                    if button['state'] == tk.NORMAL or button['state'] == tk.ACTIVE:
                         button['state'] = tk.DISABLED
 
     def start_new_round(self):
