@@ -61,7 +61,7 @@ class Main_window:
 
     def show_scores_label(self):
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
-        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN // 2, columnspan=100)
+        self.scores_label.grid(row=self.ROW + 3, column=self.COLUMN // 2, columnspan=500)
 
     def button_push(self, clicked_button: My_Button):
         same_color_btn = self.check_around(clicked_button.x, clicked_button.y, [])
@@ -197,7 +197,8 @@ class Main_window:
     def reload_game(self):
         self.show_in_console()
         self.buttons.clear()
-        self.scores = 0
+        [child.destroy() for child in self.win.winfo_children()]
+        self.scores = self.moves = 0
         self.__init__()
 
     def is_all_buttons_black(self):
