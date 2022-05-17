@@ -32,7 +32,6 @@ class My_Button(tk.Button):
 class Main_window:
     win = tk.Tk()
     win.title('Color Cubs')
-    # win.eval('tk::PlaceWindow %s center' % win.winfo_pathname(win.winfo_id()))
     win.config(bg='black')
 
     ROW = 10
@@ -92,11 +91,11 @@ class Main_window:
         if not (x, y) in some_btn_lst:
             some_btn_lst.append((x, y))
             count += 1
-        center_btn = self.buttons[x][y]['bg']
+        center_btn = self.buttons[x][y]
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
-                btn = self.buttons[x + i][y + j]['bg']
-                if btn == center_btn and (x + i, y + j) not in some_btn_lst:
+                btn = self.buttons[x + i][y + j]
+                if btn['bg'] == center_btn['bg'] and (x + i, y + j) not in some_btn_lst:
                     some_btn_lst.append((x + i, y + j))
                     count += 1
         if count == 0:
@@ -149,10 +148,7 @@ class Main_window:
                 for col in range(black_column, 0, -1):
                     btn1 = self.buttons[row][col]
                     btn2 = self.buttons[row][col - 1]
-                    if btn2['bg'] == btn1['bg'] == 'black':
-                        continue
-                    else:
-                        btn1['bg'], btn2['bg'] = btn2['bg'], btn1['bg']
+                    btn1['bg'], btn2['bg'] = btn2['bg'], btn1['bg']
 
     def counter_scores(self, same_btns):
         self.scores += len(same_btns) ** 2
@@ -193,15 +189,11 @@ class Main_window:
 
     def is_same_button_around(self, row, col):
         center_btn = self.buttons[row][col]
-        print(f'Center button is: {center_btn["bg"]}')
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 btn = self.buttons[row + i][col + j]
-                print(f'Checked button is: {btn["bg"]}')
                 if btn['bg'] == center_btn['bg'] and (btn is not center_btn):
-                    print('Has move!')
                     return True
-        print('Hasn\'t move')
         return False
 
     def is_has_moves(self):
@@ -230,8 +222,8 @@ class Main_window:
             is_finish = True
 
         elif not self.is_has_moves():
-            print(f'Theren\'t moves. Your score is : {self.scores}')
-            text = f'Theren\'t moves. Your score is: {self.scores}'
+            print(f'Game over. Your score is : {self.scores}')
+            text = f'Game over. Your score is: {self.scores}'
             is_finish = True
 
         if is_finish:
