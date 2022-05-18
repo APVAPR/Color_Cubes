@@ -180,7 +180,6 @@ class Main_window:
     def change_settings(self, row: tk.Entry, column: tk.Entry):
         self.ROW = int(row.get())
         self.COLUMN = int(column.get())
-        self.win.children['!toplevel'].destroy()
         self.reload_game()
 
     def show_in_console(self):
@@ -226,29 +225,31 @@ class Main_window:
         return False
 
     @staticmethod
-    def win_window(text):
-        win = tk.Tk()
-        win.title('You win!')
-        win.eval('tk::PlaceWindow %s center' % win.winfo_pathname(win.winfo_id()))
+    def win_window(text, win_lose):
+        win = tk.Toplevel()
+        win.title('You win!' if win_lose else 'Game over!')
+        # win.eval('tk::PlaceWindow %s center' % win.winfo_pathname(win.winfo_id()))
         label = tk.Label(win, text=text)
-        label['font'] = font.Font(size=50)
+        label['font'] = font.Font(size=20)
         label.pack()
 
     def is_finish_game(self):
-        is_finish = False
+        is_finish = is_win = False
+
         if self.is_all_buttons_black():
             self.scores *= 2
             print("You win!!!")
             text = f'You win!!! Your score is: {self.scores}'
-            is_finish = True
+            is_finish = is_win = True
 
         elif not self.is_has_moves():
             print(f'Game over. Your score is : {self.scores}')
             text = f'Game over. Your score is: {self.scores}'
             is_finish = True
+            is_win = False
 
         if is_finish:
-            self.win_window(text)
+            self.win_window(text, is_win)
             for row in self.buttons:
                 for button in row:
                     if button['state'] == tk.NORMAL or button['state'] == tk.ACTIVE:
