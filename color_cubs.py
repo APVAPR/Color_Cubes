@@ -2,26 +2,39 @@ import tkinter as tk
 import random
 from texttable import Texttable
 import tkinter.font as font
+from tkinter.messagebox import showinfo
 
 count = 0
-colors_name = {'#eb3734': 'red', '#3499eb': 'blue', '#4fbd70': 'green', '#bd79ad': 'pink', '#d9d780': 'yellow',
+rgb_to_color = {'#000000': 'black', '#eb3734': 'red', '#3499eb': 'blue', '#4fbd70': 'green', '#bd79ad': 'pink', '#d9d780': 'yellow',
                '#36856e': 'darkgreen'}
+colors_to_rgb = {v: k for k, v in rgb_to_color.items()}
 
 
 class My_Button(tk.Button):
 
     def __init__(self, master, x, y, *args, **kwargs):
-        super().__init__(master, width=1, bg=f'{self.color_rand()}')
+        random_color = My_Button.color_rand()
+        super().__init__(master, width=1, bg=f'{random_color}')
         self.master = master
         self.x = x
         self.y = y
-        self.color = self.__str__()
+        self._color = rgb_to_color[random_color]
 
     def __str__(self):
-        if self["bg"] == 'black':
-            return f'{self["bg"]}'
+        return rgb_to_color[self['bg']]
 
-        return f'{colors_name[self["bg"]]}'
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, col):
+        if col[0] == '#':
+            self['bg'] = col
+            self._color = rgb_to_color[self['bg']]
+        else:
+            self['bg'] = colors_to_rgb[col]
+            self._color = col
 
     @staticmethod
     def color_rand():
@@ -34,8 +47,8 @@ class Main_window:
     win.title('Color Cubs')
     win.config(bg='black')
 
-    ROW = 15
-    COLUMN = 15
+    ROW = 5
+    COLUMN = 5
     buttons = []
     scores = 0
     moves = 0
@@ -56,8 +69,10 @@ class Main_window:
                 temp.append(btn)
                 btn.grid(row=row, column=col)
                 if col == 0 or col == self.COLUMN + 1 or row == 0 or row == self.ROW + 1:
-                    btn.config(bg='black', state=tk.DISABLED)
+                    btn.color = '#000000'
+                    btn.config(state=tk.DISABLED)
             self.buttons.append(temp)
+        self.check_lonely_button()
 
     def show_scores_label(self):
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
@@ -95,24 +110,37 @@ class Main_window:
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 btn = self.buttons[x + i][y + j]
-                if btn['bg'] == center_btn['bg'] and (x + i, y + j) not in some_btn_lst:
+                if btn.color == center_btn.color and (x + i, y + j) not in some_btn_lst:
                     some_btn_lst.append((x + i, y + j))
                     count += 1
         if count == 0:
             return some_btn_lst
 
         for row, col in some_btn_lst:
-            if self.buttons[row][col]['bg'] == self.buttons[x][y]['bg']:
+            if self.buttons[row][col].color == self.buttons[x][y].color:
                 if not (row == x and col == y):
                     self.check_around(row, col, some_btn_lst)
         return some_btn_lst
 
+    def check_lonely_button(self):
+        change_color = self.buttons[-2][1].color
+        btns = []
+        for row in self.buttons:
+            for button in row:
+                btns.append(button)
+        btns = sorted(btns, key=lambda x: x.color)
+        # for i in sorted(self.buttons, key=lambda color: color['bg']):
+        #     if
+
+        [print(i.color, i['bg']) for i in btns]
+        print(len(btns))
+
     def change_button_state(self):
         for row in self.buttons:
             for button in row:
-                if button['bg'] == 'black' and button['state'] != 'disabled':
+                if button.color == 'black' and button['state'] != 'disabled':
                     button['state'] = tk.DISABLED
-                elif button['bg'] != 'black' and button['state'] == 'disabled':
+                elif button.color != 'black' and button['state'] == 'disabled':
                     button['state'] = tk.NORMAL
 
     def change_color_column(self, row, col):
@@ -123,10 +151,10 @@ class Main_window:
         for i in range(row, -1, -1):
             btn = self.buttons[i][col]
             btn2 = self.buttons[i - 1][col]
-            if btn2['bg'] == 'black':
-                btn['bg'] = 'black'
+            if btn2.color == 'black':
+                btn.color = 'black'
             else:
-                btn2['bg'], btn['bg'] = btn['bg'], btn2['bg']
+                btn2.color, btn.color = btn.color, btn2.color
 
     @staticmethod
     def iterate_same_btn_lst(same_color_list, func):
@@ -138,7 +166,7 @@ class Main_window:
         empty_column_list = []
         for col in range(1, self.COLUMN):
             btn = self.buttons[self.ROW][col]
-            if btn['bg'] == 'black':
+            if btn.color == 'black':
                 empty_column_list.append(col)
         return empty_column_list
 
@@ -148,7 +176,7 @@ class Main_window:
                 for col in range(black_column, 0, -1):
                     btn1 = self.buttons[row][col]
                     btn2 = self.buttons[row][col - 1]
-                    btn1['bg'], btn2['bg'] = btn2['bg'], btn1['bg']
+                    btn1.color, btn2.color = btn2.color, btn1.color
 
     def counter_scores(self, same_btns):
         self.scores += len(same_btns) ** 2
@@ -203,7 +231,7 @@ class Main_window:
     def is_all_buttons_black(self):
         for row in self.buttons:
             for button in row:
-                if button['bg'] != 'black':
+                if button.color != 'black':
                     return False
         return True
 
@@ -212,7 +240,7 @@ class Main_window:
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
                 btn = self.buttons[row + i][col + j]
-                if btn['bg'] == center_btn['bg'] and (btn is not center_btn):
+                if btn.color == center_btn.color and (btn is not center_btn):
                     return True
         return False
 
@@ -250,6 +278,7 @@ class Main_window:
 
         if is_finish:
             self.win_window(text, is_win)
+            # showinfo('You win!' if is_win else 'Game over!', 'Game over')
             for row in self.buttons:
                 for button in row:
                     if button['state'] == tk.NORMAL or button['state'] == tk.ACTIVE:
