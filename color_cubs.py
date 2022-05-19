@@ -14,7 +14,7 @@ colors_to_rgb = {v: k for k, v in rgb_to_color.items()}
 
 class My_Button(tk.Button):
 
-    def __init__(self, master, x, y, *args, **kwargs):
+    def __init__(self, master, x, y):
         random_color = My_Button.color_rand()
         super().__init__(master, width=1, bg=f'{random_color}')
         self.master = master
@@ -269,25 +269,24 @@ class Main_window:
         label.pack()
 
     def is_finish_game(self):
-        is_finish = is_win = False
+        is_finish = False
 
         if self.is_all_buttons_black():
+            title = 'You win!!!'
             self.scores *= 2
             print("You win!!!")
             text = f'You win!!! Your score is: {self.scores}'
-            is_finish = is_win = True
+            is_finish = True
 
         elif not self.is_has_moves():
+            title = 'Game over!'
             print(f'Game over. Your score is : {self.scores}')
             text = f'Game over. Your score is: {self.scores}'
             is_finish = True
-            is_win = False
 
         if is_finish:
-            self.win_window(text, is_win)
-            # showinfo('You win!' if is_win else 'Game over!', 'Game over')
+            showinfo(title, text)
             self.off_all_buttons()
-
 
     def start_new_round(self):
         self.create_menu()
