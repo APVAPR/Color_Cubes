@@ -8,7 +8,7 @@ count = 0
 rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
                 '#3499eb': 'blue', '#4fbd70': 'green',
                 '#bd79ad': 'pink', '#d9d780': 'yellow',
-               '#36856e': 'darkgreen'}
+                '#36856e': 'darkgreen'}
 colors_to_rgb = {v: k for k, v in rgb_to_color.items()}
 
 
@@ -253,6 +253,12 @@ class Main_window:
                         return True
         return False
 
+    def off_all_buttons(self):
+        for row in self.buttons:
+            for button in row:
+                if button['state'] != 'disabled':
+                    button['state'] = tk.DISABLED
+
     @staticmethod
     def win_window(text, win_lose):
         win = tk.Toplevel()
@@ -280,10 +286,8 @@ class Main_window:
         if is_finish:
             self.win_window(text, is_win)
             # showinfo('You win!' if is_win else 'Game over!', 'Game over')
-            for row in self.buttons:
-                for button in row:
-                    if button['state'] == tk.NORMAL or button['state'] == tk.ACTIVE:
-                        button['state'] = tk.DISABLED
+            self.off_all_buttons()
+
 
     def start_new_round(self):
         self.create_menu()
