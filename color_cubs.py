@@ -5,7 +5,9 @@ import tkinter.font as font
 from tkinter.messagebox import showinfo
 
 count = 0
-rgb_to_color = {'#000000': 'black', '#eb3734': 'red', '#3499eb': 'blue', '#4fbd70': 'green', '#bd79ad': 'pink', '#d9d780': 'yellow',
+rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
+                '#3499eb': 'blue', '#4fbd70': 'green',
+                '#bd79ad': 'pink', '#d9d780': 'yellow',
                '#36856e': 'darkgreen'}
 colors_to_rgb = {v: k for k, v in rgb_to_color.items()}
 
@@ -123,17 +125,16 @@ class Main_window:
         return some_btn_lst
 
     def check_lonely_button(self):
-        change_color = self.buttons[-2][1].color
         btns = []
         for row in self.buttons:
             for button in row:
                 btns.append(button)
         btns = sorted(btns, key=lambda x: x.color)
-        # for i in sorted(self.buttons, key=lambda color: color['bg']):
-        #     if
-
-        [print(i.color, i['bg']) for i in btns]
-        print(len(btns))
+        btns = [i.color for i in btns if i.color != 'black']
+        for i in btns:
+            if btns.count(i) < 2:
+                print('Lonely button')
+                self.reload_game()
 
     def change_button_state(self):
         for row in self.buttons:
