@@ -45,15 +45,30 @@ class My_Button(tk.Button):
 
 
 class Main_window:
-    win = tk.Tk()
-    win.title('Color Cubs')
-    win.config(bg='black')
 
-    ROW = 5
-    COLUMN = 5
+    ROW = 10
+    COLUMN = 10
     buttons = []
     scores = 0
     moves = 0
+
+    win = tk.Tk()
+    win.title('Color Cubs')
+    win.resizable(False, False)
+    win.config(bg='black')
+    s = win.geometry()
+    s = s.split('+')
+    s = s[0].split('x')
+    width_win = int(s[0])
+    height_win = int(s[1])
+
+    w = win.winfo_screenwidth()
+    h = win.winfo_screenheight()
+    w = w // 2
+    h = h // 2
+    w = (w - width_win) // 2
+    h = (h - height_win) // 2
+    win.geometry(f'+{w}+{h}')
 
     def __init__(self):
 
