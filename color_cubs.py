@@ -3,6 +3,7 @@ import random
 from texttable import Texttable
 import tkinter.font as font
 from tkinter.messagebox import showinfo
+import database
 
 count = 0
 rgb_to_color = {'#000000': 'black', '#eb3734': 'red',

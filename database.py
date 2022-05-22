@@ -16,3 +16,12 @@ def insert_result(name, score, moves):
     INSERT INTO RECORDS VALUES (?, ?, ?) 
     """, (name, score, moves))
     db.commit()
+
+
+def show_all_results():
+    cur.execute("""
+    SELECT * FROM RECORDS
+    """)
+    return cur.fetchall()
+
+
