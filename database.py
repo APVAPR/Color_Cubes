@@ -6,22 +6,21 @@ with sqlite3.connect('color_cubs.sqlite') as db:
     CREATE TABLE IF NOT EXISTS RECORDS (
         gamer text,
         score integer,
-        moves integer)
+        moves integer);
     """)
     db.commit()
 
 
 def insert_result(name, score, moves):
     cur.execute("""
-    INSERT INTO RECORDS VALUES (?, ?, ?) 
+    INSERT INTO RECORDS VALUES (?, ?, ?); 
     """, (name, score, moves))
     db.commit()
 
 
 def show_all_results():
     cur.execute("""
-    SELECT * FROM RECORDS
+    SELECT * FROM RECORDS;
     """)
     return cur.fetchall()
-
 

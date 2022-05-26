@@ -3,7 +3,6 @@ import random
 from texttable import Texttable
 import tkinter.font as font
 from tkinter.messagebox import showinfo
-import database
 
 count = 0
 rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
@@ -90,7 +89,8 @@ class Main_window:
                     btn.color = '#000000'
                     btn.config(state=tk.DISABLED)
             self.buttons.append(temp)
-        self.check_lonely_button()
+        if self.check_lonely_button():
+            self.reload_game()
 
     def show_scores_label(self):
         self.scores_label = tk.Label(self.win, text=f'Scores: {self.scores}', font='Arial')
@@ -150,7 +150,8 @@ class Main_window:
         for i in btns:
             if btns.count(i) < 2:
                 print('Lonely button')
-                self.reload_game()
+                return True
+        return False
 
     def change_button_state(self):
         for row in self.buttons:
@@ -286,18 +287,23 @@ class Main_window:
 
     def is_finish_game(self):
         is_finish = False
+        title = 'Game over!'
 
         if self.is_all_buttons_black():
             title = 'You win!!!'
-            self.scores *= 2
             print("You win!!!")
             text = f'You win!!! Your score is: {self.scores}'
             is_finish = True
 
+        elif self.check_lonely_button():
+            print(f'Game over. There is a fireproof cube on the field. Your score is : {self.scores}')
+            text = f'Game over. There is a fireproof cube on the field. Your score is: {self.scores}'
+            is_finish = True
+
         elif not self.is_has_moves():
-            title = 'Game over!'
-            print(f'Game over. Your score is : {self.scores}')
-            text = f'Game over. Your score is: {self.scores}'
+
+            print(f'Game over, no more moves. Your score is : {self.scores}')
+            text = f'Game over, no more moves. Your score is: {self.scores}'
             is_finish = True
 
         if is_finish:
