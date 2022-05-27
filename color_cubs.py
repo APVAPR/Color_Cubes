@@ -3,6 +3,7 @@ import random
 from texttable import Texttable
 import tkinter.font as font
 from tkinter.messagebox import showinfo
+from database import show_all_results, insert_result
 
 count = 0
 rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
@@ -206,6 +207,7 @@ class Main_window:
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label='Game', command=self.reload_game)
         file_menu.add_command(label='Settings', command=self.create_settings_menu)
+        file_menu.add_command(label='Show results', command=Table.show_winner_table)
         file_menu.add_command(label='Quit', command=self.win.destroy)
         menubar.add_cascade(label='File', menu=file_menu)
 
@@ -276,15 +278,6 @@ class Main_window:
                 if button['state'] != 'disabled':
                     button['state'] = tk.DISABLED
 
-    @staticmethod
-    def win_window(text, win_lose):
-        win = tk.Toplevel()
-        win.title('You win!' if win_lose else 'Game over!')
-        # win.eval('tk::PlaceWindow %s center' % win.winfo_pathname(win.winfo_id()))
-        label = tk.Label(win, text=text)
-        label['font'] = font.Font(size=20)
-        label.pack()
-
     def is_finish_game(self):
         is_finish = False
         title = 'Game over!'
@@ -313,6 +306,40 @@ class Main_window:
     def start_new_round(self):
         self.create_menu()
         self.win.mainloop()
+
+
+class Table:
+    winners_list = show_all_results()
+
+    def __init__(self):
+        self.win_win = tk.Toplevel()
+        self.win_win.title('Winner list!')
+        self.win_win.geometry('+500+10')
+
+    def create_top_line(self):
+        top_table = ['№', 'Name', 'Scores', 'Moves']
+
+        for i in range(4):
+            tk.Label(self.win_win, text=top_table[i],
+                     bg='LightSteelBlue',
+                     fg='Black',
+                     font=('Arial', 16, 'bold')).grid(row=0, column=i)
+
+    @staticmethod
+    def show_winner_table():
+        tab = Table()
+        tab.create_top_line()
+        i = 1
+        for index, data in enumerate(Table.winners_list, 1):
+            name, scores, moves = data
+            print(name, scores, moves)
+            tk.Label(tab.win_win, text=index).grid(row=i, column=0)
+            tk.Label(tab.win_win, text=name).grid(row=i, column=1)
+            tk.Label(tab.win_win, text=scores).grid(row=i, column=2)
+            tk.Label(tab.win_win, text=moves).grid(row=i, column=3)
+            i += 1
+
+        print(tab.winners_list)
 
 
 if __name__ == '__main__':

@@ -20,7 +20,8 @@ def insert_result(name, score, moves):
 
 def show_all_results():
     cur.execute("""
-    SELECT * FROM RECORDS;
+    SELECT * FROM RECORDS
+    ORDER BY score DESC;
     """)
     return cur.fetchall()
 
