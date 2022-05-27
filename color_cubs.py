@@ -287,6 +287,7 @@ class Main_window:
             print("You win!!!")
             text = f'You win!!! Your score is: {self.scores}'
             is_finish = True
+            Table.add_result(self.scores, self.moves)
 
         elif self.check_lonely_button():
             print(f'Game over. There is a fireproof cube on the field. Your score is : {self.scores}')
@@ -304,6 +305,7 @@ class Main_window:
             self.off_all_buttons()
 
     def start_new_round(self):
+
         self.create_menu()
         self.win.mainloop()
 
@@ -325,21 +327,37 @@ class Table:
                      fg='Black',
                      font=('Arial', 16, 'bold')).grid(row=0, column=i)
 
-    @staticmethod
-    def show_winner_table():
-        tab = Table()
-        tab.create_top_line()
+    def filling_table(self):
         i = 1
         for index, data in enumerate(Table.winners_list, 1):
             name, scores, moves = data
             print(name, scores, moves)
-            tk.Label(tab.win_win, text=index).grid(row=i, column=0)
-            tk.Label(tab.win_win, text=name).grid(row=i, column=1)
-            tk.Label(tab.win_win, text=scores).grid(row=i, column=2)
-            tk.Label(tab.win_win, text=moves).grid(row=i, column=3)
+            tk.Label(self.win_win, text=index).grid(row=i, column=0)
+            tk.Label(self.win_win, text=name).grid(row=i, column=1)
+            tk.Label(self.win_win, text=scores).grid(row=i, column=2)
+            tk.Label(self.win_win, text=moves).grid(row=i, column=3)
             i += 1
 
+    @staticmethod
+    def show_winner_table():
+        tab = Table()
+        tab.create_top_line()
+        tab.filling_table()
         print(tab.winners_list)
+
+    def add_result_window(self, scores, moves):
+        self.win_win.title('Insert your data')
+        entry_name = tk.Entry(self.win_win)
+        entry_name.pack()
+        btn = tk.Button(self.win_win,
+                        text='Add result',
+                        command=lambda: insert_result(entry_name.get(), scores, moves))
+        btn.pack()
+
+    @staticmethod
+    def add_result(scores, moves):
+        add_res_win = Table()
+        add_res_win.add_result_window(scores, moves)
 
 
 if __name__ == '__main__':
