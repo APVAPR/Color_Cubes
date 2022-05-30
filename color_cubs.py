@@ -1,7 +1,6 @@
 import tkinter as tk
 import random
 from texttable import Texttable
-import tkinter.font as font
 from tkinter.messagebox import showinfo
 from database import show_all_results, insert_result
 from tkinter.simpledialog import askstring
@@ -114,10 +113,10 @@ class Main_window:
 
     def check_around(self, x, y, some_btn_lst=None):
         """
-        Определяет такой ли цвет у соседних кнопок, как у кнопки[x][y].
-        Добавляет кортеж с координатами таких кнопок в список.
-        Рекурсивно проверяет у рядом стоящих одноцветных кнопок цвет соседних
-        Возвращает список с координатами одноцветных с нажатой кнопок
+        Checks whether adjacent buttons have the same color as button[x][y].
+        Adds a tuple with the coordinates of such buttons to the list.
+        Recursively checks the color of adjacent buttons of the same buttons
+        Returns a list with coordinates of the same color buttons pressed
 
         """
         if some_btn_lst is None:
