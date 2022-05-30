@@ -4,6 +4,7 @@ from texttable import Texttable
 import tkinter.font as font
 from tkinter.messagebox import showinfo
 from database import show_all_results, insert_result
+from tkinter.simpledialog import askstring
 
 count = 0
 rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
@@ -284,39 +285,51 @@ class Main_window:
 
         if self.is_all_buttons_black():
             title = 'You win!!!'
-            print("You win!!!")
             text = f'You win!!! Your score is: {self.scores}'
             is_finish = True
-            Table.add_result(self.scores, self.moves)
+            if Table.gamer:
+                Table.add_result(self.scores, self.moves)
 
         elif self.check_lonely_button():
-            print(f'Game over. There is a fireproof cube on the field. Your score is : {self.scores}')
             text = f'Game over. There is a fireproof cube on the field. Your score is: {self.scores}'
             is_finish = True
 
         elif not self.is_has_moves():
-
-            print(f'Game over, no more moves. Your score is : {self.scores}')
             text = f'Game over, no more moves. Your score is: {self.scores}'
             is_finish = True
 
         if is_finish:
             showinfo(title, text)
             self.off_all_buttons()
+            print(text)
 
     def start_new_round(self):
-
         self.create_menu()
         self.win.mainloop()
 
 
 class Table:
     winners_list = show_all_results()
+    _GAMER = None
 
     def __init__(self):
         self.win_win = tk.Toplevel()
         self.win_win.title('Winner list!')
         self.win_win.geometry('+500+10')
+
+    @property
+    def gamer(self):
+        return Table._GAMER
+
+    @gamer.setter
+    def gamer(self, name):
+        if not Table._GAMER:
+            Table._GAMER = name
+
+    @gamer.deleter
+    def gamer(self):
+        if Table._GAMER:
+            Table._GAMER = None
 
     def create_top_line(self):
         top_table = ['№', 'Name', 'Scores', 'Moves']
@@ -345,20 +358,15 @@ class Table:
         tab.filling_table()
         print(tab.winners_list)
 
-    def add_result_window(self, scores, moves):
-        self.win_win.title('Insert your data')
-        entry_name = tk.Entry(self.win_win)
-        entry_name.pack()
-        btn = tk.Button(self.win_win,
-                        text='Add result',
-                        command=lambda: insert_result(entry_name.get(), scores, moves))
-        btn.pack()
-
     @staticmethod
     def add_result(scores, moves):
-        add_res_win = Table()
-        add_res_win.add_result_window(scores, moves)
+        insert_result(Table.gamer, scores, moves)
 
+
+def main():
+    Table.gamer = askstring('Name', 'What is your name?')
+    a = Main_window()
 
 if __name__ == '__main__':
-    a = Main_window()
+    main()
+
