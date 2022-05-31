@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 import random
 from texttable import Texttable
@@ -54,15 +55,13 @@ class Main_window:
     moves = 0
 
     def __init__(self):
+        self.scores_label = None
         self.win = tk.Tk()
         self.win.title('Color Cubs')
         self.win.resizable(False, False)
         self.win.config(bg='black')
         self.geometry_set()
-        self.scores_label = None
-        self.make_game_buttons_list()
-        self.show_scores_label()
-        self.start_new_round()
+        self.first_start_game()
 
     def geometry_set(self):
         s = self.win.geometry()
@@ -241,14 +240,25 @@ class Main_window:
         table.add_row(score_row)
         print(table.draw())
 
+    def splash_screen(self):
+        text = 'COLOR\nCUBS'
+        label1 = tk.Button(self.win, text=text,
+                          bg='white',
+                         font=('Cube font', 50, 'bold'),
+                           command=lambda: self.reload_game())
+        label1.grid(row=0, column=0)
+
+    def first_start_game(self):
+        self.splash_screen()
+
     def reload_game(self):
-        self.show_in_console()
+        # self.show_in_console()
         self.buttons.clear()
         [child.destroy() for child in self.win.winfo_children()]
         self.scores = self.moves = 0
+        self.create_menu()
         self.make_game_buttons_list()
         self.show_scores_label()
-        # self.__init__()
 
     def is_all_buttons_black(self):
         for row in self.buttons:
@@ -304,10 +314,6 @@ class Main_window:
             if askquestion(title, text) == 'yes':
                 self.reload_game()
             print(text)
-
-    def start_new_round(self):
-        self.create_menu()
-        self.win.mainloop()
 
 
 class Table:
@@ -368,6 +374,7 @@ class Table:
 def main():
     Table.gamer = askstring('Name', 'What is your name?')
     a = Main_window()
+    a.win.mainloop()
 
 
 if __name__ == '__main__':
