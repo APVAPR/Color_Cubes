@@ -1,7 +1,7 @@
 import tkinter as tk
 import random
 from texttable import Texttable
-from tkinter.messagebox import showinfo
+from tkinter.messagebox import showinfo, askquestion
 from database import show_all_results, insert_result
 from tkinter.simpledialog import askstring
 
@@ -246,7 +246,9 @@ class Main_window:
         self.buttons.clear()
         [child.destroy() for child in self.win.winfo_children()]
         self.scores = self.moves = 0
-        self.__init__()
+        self.make_game_buttons_list()
+        self.show_scores_label()
+        # self.__init__()
 
     def is_all_buttons_black(self):
         for row in self.buttons:
@@ -290,16 +292,17 @@ class Main_window:
                 Table.add_result(self.scores, self.moves)
 
         elif self.check_lonely_button():
-            text = f'Game over. There is a fireproof cube on the field. Your score is: {self.scores}'
+            text = f'Game over. There is a fireproof cube on the field. Start a new game?'
             is_finish = True
 
         elif not self.is_has_moves():
-            text = f'Game over, no more moves. Your score is: {self.scores}'
+            text = f'Game over, no more moves. Start a new game?'
             is_finish = True
 
         if is_finish:
-            showinfo(title, text)
             self.off_all_buttons()
+            if askquestion(title, text) == 'yes':
+                self.reload_game()
             print(text)
 
     def start_new_round(self):
@@ -365,6 +368,7 @@ class Table:
 def main():
     Table.gamer = askstring('Name', 'What is your name?')
     a = Main_window()
+
 
 if __name__ == '__main__':
     main()
