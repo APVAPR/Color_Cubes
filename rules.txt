@@ -1,0 +1,5 @@
+The goal of the game is to have no colored cubes left on the board.
+When you click on a cube, all adjacent cubes of the same color are burned.
+If there are no cubes of the same color next to the pressed cube, it does not burn.
+The more cubes you burn at once, the more points you get.
+The game ends with a loss if only one cube of the same color remains on the field or there are no adjacent cubes of the same color on the field

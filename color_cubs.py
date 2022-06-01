@@ -1,17 +1,20 @@
-import time
+import gettext
 import tkinter as tk
 import random
 from texttable import Texttable
-from tkinter.messagebox import showinfo, askquestion
+from tkinter.messagebox import askquestion, showinfo
 from database import show_all_results, insert_result
 from tkinter.simpledialog import askstring
 
-count = 0
+
 rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
                 '#3499eb': 'blue', '#4fbd70': 'green',
                 '#bd79ad': 'pink', '#d9d780': 'yellow',
                 '#36856e': 'darkgreen'}
 colors_to_rgb = {v: k for k, v in rgb_to_color.items()}
+
+with open('rules.txt', 'r') as  file:
+    rules = file.read()
 
 
 class My_Button(tk.Button):
@@ -47,7 +50,6 @@ class My_Button(tk.Button):
 
 
 class Main_window:
-
     ROW = 10
     COLUMN = 10
     buttons = []
@@ -202,11 +204,11 @@ class Main_window:
     def create_menu(self):
         menubar = tk.Menu(self.win)
         self.win.config(menu=menubar)
-
         file_menu = tk.Menu(menubar, tearoff=0)
         file_menu.add_command(label='Game', command=self.reload_game)
         file_menu.add_command(label='Settings', command=self.create_settings_menu)
         file_menu.add_command(label='Show results', command=Table.show_winner_table)
+        file_menu.add_command(label='Rules', command=lambda: showinfo('Rules', rules))
         file_menu.add_command(label='Quit', command=self.win.destroy)
         menubar.add_cascade(label='File', menu=file_menu)
 
@@ -241,10 +243,10 @@ class Main_window:
         print(table.draw())
 
     def splash_screen(self):
-        text = 'COLOR\nCUBS'
+        text = 'COLOR\nCUBS\n\n\nclick\nto start\nthe game'
         label1 = tk.Button(self.win, text=text,
-                          bg='white',
-                         font=('Cube font', 50, 'bold'),
+                           bg='white',
+                           font=('Cube font', 50, 'bold'),
                            command=lambda: self.reload_game())
         label1.grid(row=0, column=0)
 
@@ -252,7 +254,6 @@ class Main_window:
         self.splash_screen()
 
     def reload_game(self):
-        # self.show_in_console()
         self.buttons.clear()
         [child.destroy() for child in self.win.winfo_children()]
         self.scores = self.moves = 0
@@ -296,8 +297,9 @@ class Main_window:
 
         if self.is_all_buttons_black():
             title = 'You win!!!'
-            text = f'You win!!! Your score is: {self.scores}'
+            text = f'Congratulation!!! You win!!! Your score is: {self.scores}. Start new game?'
             is_finish = True
+            Table.gamer = askstring('Name', 'What is your name?')
             if Table.gamer:
                 Table.add_result(self.scores, self.moves)
 
@@ -372,11 +374,10 @@ class Table:
 
 
 def main():
-    Table.gamer = askstring('Name', 'What is your name?')
+
     a = Main_window()
     a.win.mainloop()
 
 
 if __name__ == '__main__':
     main()
-
