@@ -13,7 +13,7 @@ rgb_to_color = {'#000000': 'black', '#eb3734': 'red',
                 '#36856e': 'darkgreen'}
 colors_to_rgb = {v: k for k, v in rgb_to_color.items()}
 
-with open('rules.txt', 'r') as  file:
+with open('rules.txt', 'r') as file:
     rules = file.read()
 
 
@@ -21,7 +21,7 @@ class My_Button(tk.Button):
 
     def __init__(self, master, x, y):
         random_color = My_Button.color_rand()
-        super().__init__(master, width=1, bg=f'{random_color}')
+        super().__init__(master, height=1, width=1, bg=f'{random_color}')
         self.master = master
         self.x = x
         self.y = y
